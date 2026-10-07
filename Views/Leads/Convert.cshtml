@@ -1,0 +1,66 @@
+@model Lead
+@{
+    ViewData["Title"] = "Convert Lead";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-lg-7">
+        <div class="card crm-card p-4 border-success">
+            <div class="crm-header d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                <div>
+                    <h4 class="fw-bold mb-0 text-success"><i class="bi bi-arrow-repeat me-2"></i>Convert Lead to Customer & Deal</h4>
+                    <span class="text-muted small">Promote qualified prospect into permanent account records</span>
+                </div>
+                <a asp-action="Details" asp-route-id="@Model.LeadId" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+
+            <div class="alert alert-info py-2 small mb-4">
+                <i class="bi bi-info-circle-fill me-1"></i>
+                Converting this lead will create a new Customer record for <strong>@Model.LeadName</strong> and launch a new sales Opportunity.
+            </div>
+
+            <form asp-action="ConvertLead" asp-route-id="@Model.LeadId" method="post">
+                @Html.AntiForgeryToken()
+
+                <h6 class="fw-bold text-secondary mb-3">Customer Profile Information</h6>
+                <div class="row g-3 mb-4 bg-light p-3 rounded">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Customer Name</label>
+                        <input type="text" class="form-control form-control-sm" value="@Model.LeadName" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Company</label>
+                        <input type="text" class="form-control form-control-sm" value="@(Model.CompanyName ?? "N/A")" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Email</label>
+                        <input type="text" class="form-control form-control-sm" value="@Model.Email" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">Phone</label>
+                        <input type="text" class="form-control form-control-sm" value="@Model.Phone" readonly />
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-secondary mb-3">New Opportunity Details</h6>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Opportunity Name</label>
+                        <input type="text" name="opportunityName" class="form-control" value="@ViewBag.OpportunityName" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Deal Amount ($)</label>
+                        <input type="number" name="opportunityAmount" class="form-control" value="@ViewBag.OpportunityAmount" step="100" min="1" required />
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <a asp-action="Details" asp-route-id="@Model.LeadId" class="btn btn-light border px-4">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4 fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Confirm & Convert Lead
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

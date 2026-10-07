@@ -1,0 +1,37 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary test files
+cookies.txt
+test_*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# User-specific environment files
+.env
+.env.*
+!.env.example

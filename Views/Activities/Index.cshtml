@@ -1,0 +1,138 @@
+@model IEnumerable<Activity>
+@{
+    ViewData["Title"] = "CRM Activities";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-list-check text-primary me-2"></i>Activity History & Logs</h3>
+        <span class="text-muted small">Record and track calls, meetings, emails, and sales tasks</span>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Log Activity
+    </a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card crm-card p-3 mb-4">
+    <form method="get" asp-action="Index" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Activity Type</label>
+            <select name="activityType" class="form-select form-select-sm">
+                <option value="">All Types</option>
+                <option value="Call" selected="@(ViewData["ActivityType"]?.ToString() == "Call")">Call</option>
+                <option value="Meeting" selected="@(ViewData["ActivityType"]?.ToString() == "Meeting")">Meeting</option>
+                <option value="Email" selected="@(ViewData["ActivityType"]?.ToString() == "Email")">Email</option>
+                <option value="Task" selected="@(ViewData["ActivityType"]?.ToString() == "Task")">Task</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Date</label>
+            <input type="date" name="date" value="@ViewData["Date"]" class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold text-muted">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="Completed" selected="@(ViewData["Status"]?.ToString() == "Completed")">Completed</option>
+                <option value="Planned" selected="@(ViewData["Status"]?.ToString() == "Planned")">Planned</option>
+            </select>
+        </div>
+        @if (ViewBag.UsersList != null)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Assigned User</label>
+                <select name="assignedTo" class="form-select form-select-sm" asp-items="ViewBag.UsersList">
+                    <option value="">All Users</option>
+                </select>
+            </div>
+        }
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-search me-1"></i> Filter
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="card crm-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Date & Time</th>
+                    <th>Customer / Lead</th>
+                    <th>Description</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (a.ActivityType == "Call")
+                                {
+                                    <span class="badge bg-info text-dark"><i class="bi bi-telephone me-1"></i>Call</span>
+                                }
+                                else if (a.ActivityType == "Meeting")
+                                {
+                                    <span class="badge bg-primary"><i class="bi bi-people me-1"></i>Meeting</span>
+                                }
+                                else if (a.ActivityType == "Email")
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-envelope me-1"></i>Email</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary"><i class="bi bi-check2-square me-1"></i>Task</span>
+                                }
+                            </td>
+                            <td class="fw-semibold">@a.Subject</td>
+                            <td>@a.ActivityDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                @if (a.Customer != null)
+                                {
+                                    <a asp-controller="Customers" asp-action="Details" asp-route-id="@a.CustomerId" class="text-decoration-none">
+                                        <i class="bi bi-person me-1"></i>@a.Customer.CustomerName
+                                    </a>
+                                }
+                                else if (a.Lead != null)
+                                {
+                                    <a asp-controller="Leads" asp-action="Details" asp-route-id="@a.LeadId" class="text-decoration-none text-info">
+                                        <i class="bi bi-funnel me-1"></i>@a.Lead.LeadName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@(a.Description ?? "-")</td>
+                            <td>@(a.AssignedToUser?.FullName ?? "Unassigned")</td>
+                            <td>
+                                <span class="badge @(a.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">@a.Status</span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                            No activities found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

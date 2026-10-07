@@ -1,0 +1,157 @@
+@model IEnumerable<Opportunity>
+@{
+    ViewData["Title"] = "Opportunity Pipeline";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Sales Opportunities</h3>
+        <span class="text-muted small">Track deals, stages, probabilities, and revenue forecast</span>
+    </div>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> New Opportunity
+    </a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card crm-card p-3 mb-4">
+    <form method="get" asp-action="Index" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Opportunity Name</label>
+            <input type="text" name="searchName" value="@ViewData["SearchName"]" class="form-control form-control-sm" placeholder="Search opportunity..." />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Customer</label>
+            <select name="customerId" class="form-select form-select-sm" asp-items="ViewBag.CustomerList">
+                <option value="">All Customers</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold text-muted">Stage</label>
+            <select name="stage" class="form-select form-select-sm">
+                <option value="">All Stages</option>
+                <option value="Qualification" selected="@(ViewData["Stage"]?.ToString() == "Qualification")">Qualification</option>
+                <option value="Proposal" selected="@(ViewData["Stage"]?.ToString() == "Proposal")">Proposal</option>
+                <option value="Negotiation" selected="@(ViewData["Stage"]?.ToString() == "Negotiation")">Negotiation</option>
+                <option value="Won" selected="@(ViewData["Stage"]?.ToString() == "Won")">Won</option>
+                <option value="Lost" selected="@(ViewData["Stage"]?.ToString() == "Lost")">Lost</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold text-muted">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="Open" selected="@(ViewData["Status"]?.ToString() == "Open")">Open</option>
+                <option value="Won" selected="@(ViewData["Status"]?.ToString() == "Won")">Won</option>
+                <option value="Lost" selected="@(ViewData["Status"]?.ToString() == "Lost")">Lost</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-search me-1"></i> Filter
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="card crm-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Opportunity Name</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Stage</th>
+                    <th>Probability</th>
+                    <th>Weighted Value</th>
+                    <th>Target Close</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">
+                                <a asp-action="Details" asp-route-id="@o.OpportunityId" class="text-decoration-none">
+                                    @o.OpportunityName
+                                </a>
+                            </td>
+                            <td>
+                                @if (o.Customer != null)
+                                {
+                                    <a asp-controller="Customers" asp-action="Details" asp-route-id="@o.CustomerId" class="text-secondary text-decoration-none">
+                                        @o.Customer.CustomerName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="fw-bold text-success">$@o.Amount.ToString("N0")</td>
+                            <td>
+                                @if (o.Stage == "Won")
+                                {
+                                    <span class="badge bg-success">Won</span>
+                                }
+                                else if (o.Stage == "Lost")
+                                {
+                                    <span class="badge bg-danger">Lost</span>
+                                }
+                                else if (o.Stage == "Negotiation")
+                                {
+                                    <span class="badge bg-warning text-dark">Negotiation</span>
+                                }
+                                else if (o.Stage == "Proposal")
+                                {
+                                    <span class="badge bg-info text-dark">Proposal</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">Qualification</span>
+                                }
+                            </td>
+                            <td>@o.Probability%</td>
+                            <td class="fw-semibold text-secondary">$@o.WeightedValue.ToString("N0")</td>
+                            <td>@o.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                            <td>@(o.AssignedToUser?.FullName ?? "Unassigned")</td>
+                            <td>
+                                <span class="badge @(o.Status == "Won" ? "bg-success" : (o.Status == "Lost" ? "bg-secondary" : "bg-warning text-dark"))">
+                                    @o.Status
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@o.OpportunityId" class="btn btn-sm btn-outline-info" title="Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@o.OpportunityId" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@o.OpportunityId" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                            No opportunities found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+@model IEnumerable<FollowUpReportItem>
+@{
+    ViewData["Title"] = "Follow-Up Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-check text-primary me-2"></i>Follow-Up & Overdue Activity Report</h3>
+        <span class="text-muted small">Tracking planned interactions, completions, and overdue touchpoints</span>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">All Reports</a>
+</div>
+
+<div class="card crm-card p-3 mb-4">
+    <form method="get" asp-action="FollowUps" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="Planned">Planned</option>
+                <option value="Completed">Completed</option>
+                <option value="Missed">Missed</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="card crm-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Scheduled Date</th>
+                    <th>Related To</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Alert</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model)
+                {
+                    <tr class="@(f.IsOverdue ? "table-danger bg-opacity-25" : "")">
+                        <td class="fw-semibold">@f.Subject</td>
+                        <td><span class="badge bg-light text-dark border">@f.FollowUpType</span></td>
+                        <td>@f.FollowUpDate.ToString("yyyy-MM-dd")</td>
+                        <td>@f.RelatedTo</td>
+                        <td><span class="badge @(f.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">@f.Status</span></td>
+                        <td>@f.OwnerName</td>
+                        <td>
+                            @if (f.IsOverdue)
+                            {
+                                <span class="badge bg-danger">OVERDUE</span>
+                            }
+                            else
+                            {
+                                <span class="text-success small"><i class="bi bi-check2"></i> On Schedule</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

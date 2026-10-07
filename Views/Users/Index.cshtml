@@ -1,0 +1,117 @@
+@model IEnumerable<UserManagementItemViewModel>
+@{
+    ViewData["Title"] = "User & Role Administration";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-people-fill text-primary me-2"></i>User & Role Administration</h3>
+        <span class="text-muted small">Manage system accounts, assign role permissions, handle lockouts, and reset credentials</span>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-person-plus me-1"></i> Add System User
+    </a>
+</div>
+
+<!-- Search Card -->
+<div class="card crm-card p-3 mb-4">
+    <form method="get" asp-action="Index" class="row g-2 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label small fw-semibold text-muted">Search User</label>
+            <input type="text" name="search" value="@ViewData["Search"]" class="form-control form-control-sm" placeholder="Search by name or email..." />
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-search me-1"></i> Search
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="card crm-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>System Role</th>
+                    <th>Status</th>
+                    <th>Lockout State</th>
+                    <th>Created</th>
+                    <th class="text-end">Administrative Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@u.FullName</td>
+                        <td>@u.Email</td>
+                        <td>
+                            @if (u.Role == "Admin")
+                            {
+                                <span class="badge bg-danger">Admin</span>
+                            }
+                            else if (u.Role == "Manager")
+                            {
+                                <span class="badge bg-warning text-dark">Manager</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info text-dark">SalesExecutive</span>
+                            }
+                        </td>
+                        <td>
+                            @if (u.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            @if (u.IsLockedOut)
+                            {
+                                <span class="badge bg-danger"><i class="bi bi-lock-fill me-1"></i>Locked Out</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted border">Normal (@u.AccessFailedCount fails)</span>
+                            }
+                        </td>
+                        <td>@u.CreatedDate.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-1">
+                                @if (u.IsLockedOut)
+                                {
+                                    <form asp-action="Unlock" asp-route-id="@u.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Unlock Account">
+                                            <i class="bi bi-unlock"></i> Unlock
+                                        </button>
+                                    </form>
+                                }
+
+                                <form asp-action="ToggleStatus" asp-route-id="@u.Id" method="post" class="d-inline" onsubmit="return confirm('Toggle active status for this user?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm @(u.IsActive ? "btn-outline-secondary" : "btn-outline-success")" title="@(u.IsActive ? "Deactivate" : "Activate")">
+                                        <i class="bi @(u.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i> @(u.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+
+                                <a asp-action="ResetPassword" asp-route-id="@u.Id" class="btn btn-sm btn-outline-primary" title="Reset Password">
+                                    <i class="bi bi-key"></i> Reset
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

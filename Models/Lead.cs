@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace AcxiomCRM.Models
+{
+    public class Lead
+    {
+        [Key]
+        public int LeadId { get; set; }
+
+        [MaxLength(50)]
+        [Display(Name = "Lead Code")]
+        public string LeadCode { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Lead Name is required.")]
+        [StringLength(100, ErrorMessage = "Lead Name cannot exceed 100 characters.")]
+        [Display(Name = "Lead Name")]
+        public string LeadName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Phone is required.")]
+        [RegularExpression(@"^[0-9+\-\s()]{7,20}$", ErrorMessage = "Enter a valid phone number.")]
+        [StringLength(20, ErrorMessage = "Phone cannot exceed 20 characters.")]
+        public string Phone { get; set; } = string.Empty;
+
+        [StringLength(100, ErrorMessage = "Company Name cannot exceed 100 characters.")]
+        [Display(Name = "Company Name")]
+        public string? CompanyName { get; set; }
+
+        [Required(ErrorMessage = "Lead Source is required.")]
+        [MaxLength(50)]
+        public string Source { get; set; } = "Website"; // Website, Referral, Cold Call, Trade Show, Email Campaign, Social Media, Other
+
+        [Required(ErrorMessage = "Status is required.")]
+        [MaxLength(30)]
+        public string Status { get; set; } = "New"; // New, Contacted, Qualified, Unqualified, Converted, Lost
+
+        [MaxLength(20)]
+        public string Priority { get; set; } = "Medium"; // Low, Medium, High
+
+        [Range(0, 100000000, ErrorMessage = "Expected Value must be greater than or equal to 0.")]
+        [Column(TypeName = "decimal(18,2)")]
+        [Display(Name = "Expected Value")]
+        public decimal ExpectedValue { get; set; } = 0;
+
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(450)]
+        [Display(Name = "Assigned To")]
+        public string? AssignedTo { get; set; }
+
+        [ForeignKey("AssignedTo")]
+        public virtual ApplicationUser? AssignedToUser { get; set; }
+
+        // Navigation properties
+        public virtual ICollection<Opportunity> Opportunities { get; set; } = new List<Opportunity>();
+        public virtual ICollection<FollowUp> FollowUps { get; set; } = new List<FollowUp>();
+        public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
+    }
+}

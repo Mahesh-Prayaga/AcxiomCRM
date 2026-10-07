@@ -1,0 +1,67 @@
+@model IEnumerable<OpportunityReportItem>
+@{
+    ViewData["Title"] = "Opportunity Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Opportunity & Revenue Report</h3>
+        <span class="text-muted small">Deal progression, stages, probability forecasts, and close schedules</span>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">All Reports</a>
+</div>
+
+<div class="card crm-card p-3 mb-4">
+    <form method="get" asp-action="Opportunities" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Stage</label>
+            <select name="stage" class="form-select form-select-sm">
+                <option value="">All Stages</option>
+                <option value="Qualification">Qualification</option>
+                <option value="Proposal">Proposal</option>
+                <option value="Negotiation">Negotiation</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="card crm-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Opportunity</th>
+                    <th>Customer</th>
+                    <th>Stage</th>
+                    <th>Contract Amount</th>
+                    <th>Probability</th>
+                    <th>Weighted Value</th>
+                    <th>Target Close</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@o.OpportunityName</td>
+                        <td>@o.CustomerName</td>
+                        <td><span class="badge bg-primary">@o.Stage</span></td>
+                        <td class="fw-bold text-success">$@o.Amount.ToString("N0")</td>
+                        <td>@o.Probability%</td>
+                        <td class="fw-semibold text-dark">$@o.WeightedValue.ToString("N0")</td>
+                        <td>@o.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                        <td>@o.OwnerName</td>
+                        <td><span class="badge @(o.Status == "Won" ? "bg-success" : (o.Status == "Lost" ? "bg-secondary" : "bg-warning text-dark"))">@o.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

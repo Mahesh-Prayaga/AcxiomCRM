@@ -1,0 +1,165 @@
+@model IEnumerable<Lead>
+@{
+    ViewData["Title"] = "Lead Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-funnel text-primary me-2"></i>Leads</h3>
+        <span class="text-muted small">Capture prospects, qualify leads, and track conversion funnel</span>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-funnel me-1"></i> Capture Lead
+    </a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card crm-card p-3 mb-4">
+    <form method="get" asp-action="Index" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Lead Name</label>
+            <input type="text" name="searchName" value="@ViewData["SearchName"]" class="form-control form-control-sm" placeholder="Lead name..." />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold text-muted">Company</label>
+            <input type="text" name="searchCompany" value="@ViewData["SearchCompany"]" class="form-control form-control-sm" placeholder="Company..." />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold text-muted">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="New" selected="@(ViewData["Status"]?.ToString() == "New")">New</option>
+                <option value="Contacted" selected="@(ViewData["Status"]?.ToString() == "Contacted")">Contacted</option>
+                <option value="Qualified" selected="@(ViewData["Status"]?.ToString() == "Qualified")">Qualified</option>
+                <option value="Unqualified" selected="@(ViewData["Status"]?.ToString() == "Unqualified")">Unqualified</option>
+                <option value="Converted" selected="@(ViewData["Status"]?.ToString() == "Converted")">Converted</option>
+                <option value="Lost" selected="@(ViewData["Status"]?.ToString() == "Lost")">Lost</option>
+            </select>
+        </div>
+        @if (ViewBag.UsersList != null)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Assigned To</label>
+                <select name="assignedTo" class="form-select form-select-sm" asp-items="ViewBag.UsersList">
+                    <option value="">All Users</option>
+                </select>
+            </div>
+        }
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-search me-1"></i> Filter
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="card crm-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Lead Name</th>
+                    <th>Contact</th>
+                    <th>Source</th>
+                    <th>Expected Value</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var l in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-light text-dark border">@l.LeadCode</span></td>
+                            <td class="fw-semibold">
+                                <a asp-action="Details" asp-route-id="@l.LeadId" class="text-decoration-none">
+                                    @l.LeadName
+                                </a>
+                                @if (!string.IsNullOrEmpty(l.CompanyName))
+                                {
+                                    <div class="small text-muted">@l.CompanyName</div>
+                                }
+                            </td>
+                            <td>
+                                <div><i class="bi bi-envelope me-1 text-muted small"></i>@l.Email</div>
+                                <div><i class="bi bi-telephone me-1 text-muted small"></i>@l.Phone</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@l.Source</span></td>
+                            <td class="fw-bold text-success">$@l.ExpectedValue.ToString("N0")</td>
+                            <td>
+                                @if (l.Priority == "High")
+                                {
+                                    <span class="badge bg-danger">High</span>
+                                }
+                                else if (l.Priority == "Medium")
+                                {
+                                    <span class="badge bg-warning text-dark">Medium</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Low</span>
+                                }
+                            </td>
+                            <td>
+                                @if (l.Status == "Converted")
+                                {
+                                    <span class="badge bg-success">Converted</span>
+                                }
+                                else if (l.Status == "Qualified")
+                                {
+                                    <span class="badge bg-info text-dark">Qualified</span>
+                                }
+                                else if (l.Status == "Contacted")
+                                {
+                                    <span class="badge bg-primary">Contacted</span>
+                                }
+                                else if (l.Status == "Lost")
+                                {
+                                    <span class="badge bg-danger">Lost</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">New</span>
+                                }
+                            </td>
+                            <td>@(l.AssignedToUser?.FullName ?? "Unassigned")</td>
+                            <td class="text-end">
+                                @if (l.Status != "Converted")
+                                {
+                                    <a asp-action="Convert" asp-route-id="@l.LeadId" class="btn btn-sm btn-outline-success" title="Convert to Customer/Opportunity">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </a>
+                                }
+                                <a asp-action="Details" asp-route-id="@l.LeadId" class="btn btn-sm btn-outline-info" title="Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@l.LeadId" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@l.LeadId" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                            No leads found matching current criteria.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

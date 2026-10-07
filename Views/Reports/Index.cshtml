@@ -1,0 +1,125 @@
+@{
+    ViewData["Title"] = "CRM Reports Center";
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i>CRM Intelligence & Reports Center</h3>
+    <span class="text-muted small">Access analytical breakdowns, pipeline summaries, and team performance reports</span>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card crm-card p-4 h-100">
+            <div class="d-flex align-items-center mb-3">
+                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded me-3">
+                    <i class="bi bi-people fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Customer Report</h5>
+                    <small class="text-muted">Master database & account status</small>
+                </div>
+            </div>
+            <p class="text-muted small">Comprehensive overview of account status, assignment ownership, and contact profiles.</p>
+            <a asp-action="Customers" class="btn btn-outline-primary btn-sm mt-auto">Open Report &rarr;</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card crm-card p-4 h-100">
+            <div class="d-flex align-items-center mb-3">
+                <div class="p-3 bg-info bg-opacity-10 text-info rounded me-3">
+                    <i class="bi bi-funnel fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Lead Report</h5>
+                    <small class="text-muted">Inbound sources & qualification</small>
+                </div>
+            </div>
+            <p class="text-muted small">Lead generation channels, conversion tracking, prospective deal valuations, and ownership.</p>
+            <a asp-action="Leads" class="btn btn-outline-info btn-sm mt-auto">Open Report &rarr;</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card crm-card p-4 h-100">
+            <div class="d-flex align-items-center mb-3">
+                <div class="p-3 bg-warning bg-opacity-10 text-warning rounded me-3">
+                    <i class="bi bi-calendar-check fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Follow-Up Report</h5>
+                    <small class="text-muted">Planned & overdue activities</small>
+                </div>
+            </div>
+            <p class="text-muted small">Timeline of customer commitments, completed interactions, and overdue reminders.</p>
+            <a asp-action="FollowUps" class="btn btn-outline-warning btn-sm mt-auto">Open Report &rarr;</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card crm-card p-4 h-100">
+            <div class="d-flex align-items-center mb-3">
+                <div class="p-3 bg-success bg-opacity-10 text-success rounded me-3">
+                    <i class="bi bi-graph-up-arrow fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Opportunity Report</h5>
+                    <small class="text-muted">Deal breakdown & probabilities</small>
+                </div>
+            </div>
+            <p class="text-muted small">Detailed breakdown of active deals, revenue forecasts, probabilities, and closing dates.</p>
+            <a asp-action="Opportunities" class="btn btn-outline-success btn-sm mt-auto">Open Report &rarr;</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card crm-card p-4 h-100 border-start border-primary border-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded me-3">
+                    <i class="bi bi-diagram-3 fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Pipeline Matrix Report</h5>
+                    <small class="text-muted">Weighted stage & owner metrics</small>
+                </div>
+            </div>
+            <p class="text-muted small">Stage-by-stage distribution, owner-wise quotas, and probability-weighted pipeline amounts.</p>
+            <a asp-action="Pipeline" class="btn btn-primary btn-sm mt-auto">Open Pipeline Analysis &rarr;</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card crm-card p-4 h-100 border-start border-success border-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="p-3 bg-success bg-opacity-10 text-success rounded me-3">
+                    <i class="bi bi-arrow-repeat fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Conversion Report</h5>
+                    <small class="text-muted">Lead-to-customer efficiency</small>
+                </div>
+            </div>
+            <p class="text-muted small">Assess conversion rates, lead loss rates, and list of won client conversions.</p>
+            <a asp-action="Conversion" class="btn btn-success btn-sm mt-auto">Open Conversion Metrics &rarr;</a>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card crm-card p-4 h-100 border-start border-info border-3">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 bg-info bg-opacity-10 text-info rounded me-3">
+                        <i class="bi bi-person-lines-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">User Activity Report</h5>
+                        <small class="text-muted">Managerial team oversight</small>
+                    </div>
+                </div>
+                <p class="text-muted small">Analyze customer touchpoints, calls, emails, and meetings logged per sales executive.</p>
+                <a asp-action="UserActivities" class="btn btn-info btn-sm text-dark mt-auto">Open Activity Report &rarr;</a>
+            </div>
+        </div>
+    }
+</div>

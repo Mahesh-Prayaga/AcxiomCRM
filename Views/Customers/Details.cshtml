@@ -1,0 +1,129 @@
+@model Customer
+@{
+    ViewData["Title"] = "Customer Profile - " + Model.CustomerName;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge text-primary me-2"></i>@Model.CustomerName</h3>
+        <span class="badge bg-light text-dark border">@Model.CustomerCode</span> &bull;
+        <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary")">@Model.Status</span> &bull;
+        <span class="text-muted small">Managed by @(Model.AssignedToUser?.FullName ?? "Unassigned")</span>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i> Edit Customer
+        </a>
+        <a asp-controller="Opportunities" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Deal
+        </a>
+        <a asp-controller="FollowUps" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-primary btn-sm">
+            <i class="bi bi-calendar-plus me-1"></i> Schedule Follow-Up
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card crm-card p-3 h-100">
+            <h5 class="fw-bold text-secondary mb-3 border-bottom pb-2">Customer Profile</h5>
+            <div class="mb-2"><strong class="text-muted small d-block">Company:</strong> @(Model.CompanyName ?? "N/A")</div>
+            <div class="mb-2"><strong class="text-muted small d-block">Email:</strong> <a href="mailto:@Model.Email">@Model.Email</a></div>
+            <div class="mb-2"><strong class="text-muted small d-block">Phone:</strong> <a href="tel:@Model.Phone">@Model.Phone</a></div>
+            <div class="mb-2"><strong class="text-muted small d-block">Address:</strong> @(Model.Address ?? "N/A")</div>
+            <div class="mb-2"><strong class="text-muted small d-block">City/State:</strong> @Model.City @(string.IsNullOrEmpty(Model.State) ? "" : $", {Model.State}")</div>
+            <div class="mb-2"><strong class="text-muted small d-block">Created On:</strong> @Model.CreatedDate.ToString("MMM dd, yyyy HH:mm")</div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Linked Opportunities -->
+        <div class="card crm-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold text-secondary mb-0"><i class="bi bi-graph-up-arrow me-1"></i> Deals / Opportunities</h5>
+                <a asp-controller="Opportunities" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-plus"></i> New Deal
+                </a>
+            </div>
+            @if (Model.Opportunities.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Stage</th>
+                                <th>Probability</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in Model.Opportunities)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@o.OpportunityId">
+                                            @o.OpportunityName
+                                        </a>
+                                    </td>
+                                    <td class="fw-bold text-success">$@o.Amount.ToString("N0")</td>
+                                    <td><span class="badge bg-primary">@o.Stage</span></td>
+                                    <td>@o.Probability%</td>
+                                    <td><span class="badge @(o.Status == "Won" ? "bg-success" : (o.Status == "Lost" ? "bg-danger" : "bg-warning text-dark"))">@o.Status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small mb-0 py-2">No opportunities created for this customer yet.</p>
+            }
+        </div>
+
+        <!-- Linked Follow-ups -->
+        <div class="card crm-card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold text-secondary mb-0"><i class="bi bi-calendar-check me-1"></i> Scheduled Follow-Ups</h5>
+                <a asp-controller="FollowUps" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> Schedule
+                </a>
+            </div>
+            @if (Model.FollowUps.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Subject</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var f in Model.FollowUps.OrderByDescending(f => f.FollowUpDate))
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@f.Subject</td>
+                                    <td><span class="badge bg-light text-dark border">@f.FollowUpType</span></td>
+                                    <td>@f.FollowUpDate.ToString("MMM dd, yyyy")</td>
+                                    <td><span class="badge @(f.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">@f.Status</span></td>
+                                    <td class="text-muted">@(f.Remarks ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small mb-0 py-2">No follow-ups recorded yet.</p>
+            }
+        </div>
+    </div>
+</div>

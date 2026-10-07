@@ -1,0 +1,122 @@
+@model PipelineReportViewModel
+@{
+    ViewData["Title"] = "Sales Pipeline Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-diagram-3 text-primary me-2"></i>Sales Pipeline Matrix Report</h3>
+        <span class="text-muted small">Stage-by-stage distribution and representative quota analysis</span>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">All Reports</a>
+</div>
+
+<!-- High Level Pipeline Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card crm-card p-4 border-start border-primary border-4">
+            <div class="text-muted small fw-semibold text-uppercase">Total Active Pipeline Potential</div>
+            <div class="fs-2 fw-bold text-primary mt-1">$@Model.TotalPipelineAmount.ToString("N0")</div>
+            <div class="small text-muted mt-2">Sum of all open deals currently in sales cycle</div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card crm-card p-4 border-start border-success border-4">
+            <div class="text-muted small fw-semibold text-uppercase">Total Probability-Weighted Forecast</div>
+            <div class="fs-2 fw-bold text-success mt-1">$@Model.TotalWeightedPipeline.ToString("N0")</div>
+            <div class="small text-muted mt-2">Calculated using &Sigma; (Amount &times; Win Probability %)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Stage Wise Totals -->
+    <div class="col-lg-6">
+        <div class="card crm-card p-3 h-100">
+            <h5 class="fw-bold text-secondary mb-3 border-bottom pb-2">Pipeline by Sales Stage</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Stage</th>
+                            <th class="text-end">Deal Volume ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var stage in Model.StageWiseTotals)
+                        {
+                            <tr>
+                                <td><span class="badge bg-primary">@stage.Key</span></td>
+                                <td class="text-end fw-bold">$@stage.Value.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Wise Totals -->
+    <div class="col-lg-6">
+        <div class="card crm-card p-3 h-100">
+            <h5 class="fw-bold text-secondary mb-3 border-bottom pb-2">Pipeline by Sales Representative</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sales Representative</th>
+                            <th class="text-end">Assigned Volume ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var owner in Model.OwnerWiseTotals)
+                        {
+                            <tr>
+                                <td><span class="fw-semibold">@owner.Key</span></td>
+                                <td class="text-end fw-bold text-success">$@owner.Value.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Opportunities Table -->
+<div class="card crm-card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h5 class="fw-bold text-secondary mb-0">Underlying Pipeline Deals</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Deal Name</th>
+                    <th>Customer</th>
+                    <th>Stage</th>
+                    <th>Amount</th>
+                    <th>Probability</th>
+                    <th>Weighted Value</th>
+                    <th>Expected Close</th>
+                    <th>Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model.Opportunities)
+                {
+                    <tr>
+                        <td class="fw-semibold">@o.OpportunityName</td>
+                        <td>@o.CustomerName</td>
+                        <td><span class="badge bg-primary">@o.Stage</span></td>
+                        <td class="fw-bold text-success">$@o.Amount.ToString("N0")</td>
+                        <td>@o.Probability%</td>
+                        <td class="fw-semibold">$@o.WeightedValue.ToString("N0")</td>
+                        <td>@o.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                        <td>@o.OwnerName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

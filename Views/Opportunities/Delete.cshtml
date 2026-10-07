@@ -1,0 +1,46 @@
+@model Opportunity
+@{
+    ViewData["Title"] = "Delete Opportunity";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-6">
+        <div class="card border-danger crm-card p-4">
+            <div class="crm-header d-flex align-items-center text-danger border-bottom pb-3 mb-3">
+                <i class="bi bi-exclamation-triangle-fill fs-2 me-2"></i>
+                <div>
+                    <h4 class="fw-bold mb-0">Confirm Opportunity Removal</h4>
+                    <small class="text-muted">Review deal details before proceeding</small>
+                </div>
+            </div>
+
+            <p class="text-muted">
+                Are you sure you want to remove opportunity <strong>@Model.OpportunityName</strong>?
+            </p>
+
+            <dl class="row small mb-4">
+                <dt class="col-sm-4 text-muted">Opportunity:</dt>
+                <dd class="col-sm-8 fw-semibold">@Model.OpportunityName</dd>
+
+                <dt class="col-sm-4 text-muted">Customer:</dt>
+                <dd class="col-sm-8">@(Model.Customer?.CustomerName ?? "-")</dd>
+
+                <dt class="col-sm-4 text-muted">Amount:</dt>
+                <dd class="col-sm-8 text-success fw-bold">$@Model.Amount.ToString("N0")</dd>
+
+                <dt class="col-sm-4 text-muted">Stage:</dt>
+                <dd class="col-sm-8"><span class="badge bg-secondary">@Model.Stage</span></dd>
+            </dl>
+
+            <form asp-action="Delete" asp-route-id="@Model.OpportunityId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-light border px-4">Cancel</a>
+                    <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                        <i class="bi bi-trash me-1"></i> Yes, Remove Opportunity
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
